@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="gl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VilaCube - Servidor Minecraft</title>
+  <style>
+    /* ---------- CORES PRINCIPAIS (Xunta de Galicia) ---------- */
+    :root {
+      --azul-xunta: #003b8e;
+      --azul-xunta-escuro: #00275f;
+      --dourado: #d4af37;
+      --branco: #ffffff;
+    }
+
+    /* ---------- ESTILO XERAL ---------- */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--azul-xunta-escuro);
+      color: var(--branco);
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    header {
+      background: var(--azul-xunta);
+      padding: 20px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--dourado);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    /* ---------- BOTÓNS ---------- */
+    .nav {
+      display: flex;
+      gap: 15px;
+    }
+    .nav a {
+      text-decoration: none;
+      color: var(--dourado);
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 10px 18px;
+      border: 2px solid var(--dourado);
+      border-radius: 30px;
+      transition: 0.3s;
+    }
+    .nav a:hover {
+      background: var(--dourado);
+      color: var(--azul-xunta);
+      transform: scale(1.2) rotate(3deg);
+      box-shadow: 0 0 20px var(--dourado);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.8rem;
+      color: var(--branco);
+      text-shadow: 0 0 10px #000;
+      animation: titlePop 1.5s ease-out;
+    }
+
+    @keyframes titlePop {
+      0% { transform: scale(0.7); opacity: 0; }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ---------- CONTIDO PRINCIPAL ---------- */
+    .container {
+      width: 95%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 40px 0;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      padding: 40px;
+      border-radius: 20px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.5);
+      border: 2px solid var(--dourado);
+    }
+
+    h2 {
+      color: var(--dourado);
+      font-size: 2rem;
+      margin-top: 0;
+      text-shadow: 0 0 10px #000;
+    }
+
+    /* ---------- CAIXA DE IP ---------- */
+    .ip-box {
+      background: var(--branco);
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 1.8rem;
+      border: 4px solid var(--dourado);
+      color: var(--azul-xunta);
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(212,175,55,0.7);
+      animation: ipPulse 3s infinite ease-in-out;
+    }
+
+    @keyframes ipPulse {
+      0% { transform: scale(1); box-shadow: 0 0 15px rgba(212,175,55,0.7); }
+      50% { transform: scale(1.07); box-shadow: 0 0 30px rgba(255,230,150,1); }
+      100% { transform: scale(1); }
+    }
+
+    /* ---------- BOTÓN DA TENDA ---------- */
+    .store-btn {
+      display: block;
+      width: 100%;
+      padding: 20px;
+      background: var(--dourado);
+      border: none;
+      border-radius: 15px;
+      color: var(--azul-xunta);
+      font-size: 1.6rem;
+      text-align: center;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+    .store-btn:hover {
+      transform: scale(1.15);
+      background: #ffdc6a;
+      box-shadow: 0 0 20px var(--dourado);
+    }
+
+    /* ---------- SECCIONES OCULTAS ---------- */
+    .hidden {
+      display: none;
+    }
+
+    /* ---------- GALERÍA ---------- */
+    .galeria-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+      margin-top: 20px;
+    }
+    .galeria-grid img {
+      width: 100%;
+      border-radius: 15px;
+      border: 3px solid var(--dourado);
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      opacity: 0;
+      transform: rotate(-10deg) scale(0.7);
+      animation: zoomSpin 1s forwards;
+    }
+
+    @keyframes zoomSpin {
+      to {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+      }
+    }
+
+    .placeholder {
+      padding: 50px;
+      background: rgba(255,255,255,0.1);
+      color: var(--branco);
+      border: 3px dashed var(--dourado);
+      text-align: center;
+      border-radius: 15px;
+      font-weight: bold;
+    }
+  </style>
+
+  <script>
+    function mostrar(seccion) {
+      document.getElementById("info").classList.add("hidden");
+      document.getElementById("galeria").classList.add("hidden");
+
+      document.getElementById(seccion).classList.remove("hidden");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+
+</head>
+
+<body>
+  <header>
+    <h1>VilaCube</h1>
+
+    <div class="nav">
+      <a href="#" onclick="mostrar('info')">Información</a>
+      <a href="#" onclick="mostrar('galeria')">Galería</a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- --------- PÁXINA PRINCIPAL --------- -->
+    <div class="section">
+      <h2>IP do Servidor</h2>
+      <div class="ip-box">behind-impressive.gl.at.ply.gg:1780</div>
+
+      <p style="margin-top:25px; font-size:1.3rem;">
+        Benvido a <strong>VilaCube</strong>, un servidor local de estilo 
+        semi-anárquico onde o importante é pasalo ben, colaborar e vivir aventuras.
+      </p>
+
+      <a class="store-btn" href="#">Mercar VIP</a>
+    </div>
+
+    <!-- --------- SECCIÓN OCULTA: INFORMACIÓN --------- -->
+    <div class="section hidden" id="info">
+      <h2>Información Completa</h2>
+      <p><strong>VilaCube</strong> nace como un proxecto local para xogar entre amigos, veciños e xente de Vilagarcía de Arousa. Servidor relaxado, comunitario e con anarquía controlada.</p>
+      <p>Buscamos crear un espazo próximo, auténtico e cheo de vida.</p>
+    </div>
+
+    <!-- --------- SECCIÓN OCULTA: GALERÍA --------- -->
+    <div class="section hidden" id="galeria">
+      <h2>Galería</h2>
+      <div class="galeria-grid">
+        <div class="placeholder">Agardando imaxes...</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
